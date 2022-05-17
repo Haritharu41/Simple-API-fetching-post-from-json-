@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'model/User.dart';
 import 'model/post.dart';
 
 void main() {
@@ -24,17 +25,17 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  Future<List<Post>> fetchPost() async {
+  Future<List<User>> fetchUser() async {
     final response =
-        await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+        await http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
 
     if (response.statusCode == 200) {
-      List<Post> myposts = [];
+      List<User> users = [];
       var data = jsonDecode(response.body);
       for (Map i in data) {
-        myposts.add(Post.fromJson(i as Map<String, dynamic>));
+        users.add(User.fromJson(i as Map<String, dynamic>));
       }
-      return myposts;
+      return users;
     } else {
       throw Exception('Failed to load album');
     }
@@ -46,8 +47,8 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("User app"),
       ),
-      body: FutureBuilder<List<Post>>(
-          future: fetchPost(),
+      body: FutureBuilder<List<User>>(
+          future: fetchUser(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
@@ -65,17 +66,25 @@ class HomePage extends StatelessWidget {
 }
 
 class Mybox extends StatelessWidget {
-  final Post p;
+  final User p;
   Mybox(this.p);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        child: Text("${p.id}"),
-      ),
-      title: Text("${p.title}"),
-      subtitle: Text("${p.body}"),
+    return Card(
+      child: Column(children: [
+        Text(
+          "Id:" + p.id.toString(),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "Name:" + p.name.toString(),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        Text(
+            "Address:${p.address!.street.toString()} ,${p.address!.zipcode.toString()}"),
+        Text("Company:" + p.company!.name.toString())
+      ]),
     );
   }
 }
